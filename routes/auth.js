@@ -1,5 +1,5 @@
 import express from "express";
-import postSignup from "../controllers/auth.js";
+import { postSignup } from "../controllers/auth.js";
 import { body } from "express-validator";
 import User from "../models/user.js";
 
