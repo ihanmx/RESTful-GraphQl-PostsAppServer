@@ -8,7 +8,7 @@ import corsOptions from "./config/corsOptions.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url"; //to get __dirname in ES modules
-
+import { init as initSocket } from "./config/socket.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -38,10 +38,13 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
+    const server = app.listen(port);
+
+    const io = initSocket(server);
+    io.on("connection", (socket) => {
+      console.log("client connected");
+    });
   })
   .catch((err) => {
     console.log("Failed to connect to MongoDB", err);
   });
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});

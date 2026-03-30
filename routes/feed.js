@@ -9,6 +9,7 @@ import {
 import { body } from "express-validator";
 import multer from "multer";
 import isAuth from "../middleware/isAuth.js";
+import { init as initSocket } from "../config/socket.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "images"),
