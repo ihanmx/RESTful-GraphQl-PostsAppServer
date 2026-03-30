@@ -1,5 +1,5 @@
 import express from "express";
-import { postSignup } from "../controllers/auth.js";
+import { postSignup, postLogin } from "../controllers/auth.js";
 import { body } from "express-validator";
 import User from "../models/user.js";
 
@@ -26,5 +26,7 @@ router.post(
   ],
   postSignup,
 );
+
+router.post("/login", [body("email").isEmail().normalizeEmail()], postLogin);
 
 export default router;

@@ -8,6 +8,7 @@ import {
 } from "../controllers/feed.js";
 import { body } from "express-validator";
 import multer from "multer";
+import isAuth from "../middleware/isAuth.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "images"),
@@ -23,10 +24,11 @@ const router = express.Router();
 
 //Get /feed/posts
 
-router.get("/posts", getPosts);
+router.get("/posts", isAuth, getPosts);
 
 router.post(
   "/post",
+  isAuth,
   upload.single("image"),
   [
     body("title").trim().isLength({ min: 5 }),
@@ -35,10 +37,11 @@ router.post(
   createPost,
 );
 
-router.get("/post/:postId", getPost);
+router.get("/post/:postId", isAuth, getPost);
 
 router.put(
   "/post/:postId",
+  isAuth,
   upload.single("image"),
   [
     body("title").trim().isLength({ min: 5 }),
@@ -49,6 +52,7 @@ router.put(
 
 router.delete(
   "/post/:postId",
+  isAuth,
   [
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
