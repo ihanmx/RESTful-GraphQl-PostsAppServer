@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import feedRoutes from "./routes/feed.js";
+import authRoutes from "./routes/auth.js";
 import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import mongoose from "mongoose";
@@ -20,13 +21,15 @@ app.use(express.json());
 //static files
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 //general error handling middleware
 app.use((error, req, res, next) => {
   console.log(error);
   const status = error.statusCode || 500;
   const message = error.message;
-  res.status(status).json({ message: message });
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
 });
 
 mongoose
