@@ -9,6 +9,9 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url"; //to get __dirname in ES modules
 import { init as initSocket } from "./config/socket.js";
+import { graphqlHTTP } from "express-graphql";
+import graphqlSchema from "./graphql/schema.js";
+import graphqlResolver from "./graphql/resolvers.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,9 +24,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 //static files
 app.use("/images", express.static(path.join(__dirname, "images")));
-app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
-app.use("/status", statusRoutes);
+// app.use("/feed", feedRoutes);
+// app.use("/auth", authRoutes);
+// app.use("/status", statusRoutes);
+
+app.use(
+  "/graphql",
+  graphqlHTTP({ schema: graphqlSchema, rootValue: graphqlResolver }),
+);
 
 //general error handling middleware
 app.use((error, req, res, next) => {
