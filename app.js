@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import feedRoutes from "./routes/feed.js";
 import authRoutes from "./routes/auth.js";
+import statusRoutes from "./routes/status.js";
 import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import mongoose from "mongoose";
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/feed", feedRoutes);
 app.use("/auth", authRoutes);
+app.use("/status", statusRoutes);
 
 //general error handling middleware
 app.use((error, req, res, next) => {
