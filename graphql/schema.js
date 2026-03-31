@@ -30,6 +30,10 @@ const schema = buildSchema(`
         password:String
     }
 
+    type RootQuery{
+        hello:String
+    }
+
 
 
    
@@ -39,6 +43,7 @@ const schema = buildSchema(`
 
     schema {
         mutation:RootMutation
+        query:RootQuery
     }
     
     

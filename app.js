@@ -27,10 +27,24 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // app.use("/feed", feedRoutes);
 // app.use("/auth", authRoutes);
 // app.use("/status", statusRoutes);
-
+//http://localhost:5000/graphql
 app.use(
   "/graphql",
-  graphqlHTTP({ schema: graphqlSchema, rootValue: graphqlResolver }),
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+    graphiql: true, //special tool to test API
+    customFormatErrorFn(err) {
+      if (!err.originalError) {
+        return err;
+      }
+
+      const data = err.originalError.data;
+      const message = err.originalError.message || "An error occurred";
+      const code = err.originalError.code || 500;
+      return { message: message, status: code, data: data };
+    },
+  }),
 );
 
 //general error handling middleware
