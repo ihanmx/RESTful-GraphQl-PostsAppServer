@@ -1,6 +1,6 @@
 import express from "express";
 import { getStatus, updateStatus } from "../controllers/status.js";
-import isAuth from "../middleware/isAuth.js";
+import isAuth from "../middleware/auth.js";
 
 const router = express.Router();
 

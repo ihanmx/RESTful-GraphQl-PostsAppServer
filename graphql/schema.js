@@ -30,8 +30,22 @@ const schema = buildSchema(`
         password:String
     }
 
+
+    input PostData{
+        title:String!
+        content:String!
+        imageUrl:String!
+    
+    }
+
+    type AuthData{
+        token:String
+        userId:String
+    
+    }
+
     type RootQuery{
-        hello:String
+        login(email:String!,password:String!):AuthData!
     }
 
 
@@ -39,6 +53,7 @@ const schema = buildSchema(`
    
     type RootMutation {
         createUser(userInput:UserData):User!
+        createPost(postInput:PostData):Post!
     }
 
     schema {

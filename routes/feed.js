@@ -8,7 +8,7 @@ import {
 } from "../controllers/feed.js";
 import { body } from "express-validator";
 import multer from "multer";
-import isAuth from "../middleware/isAuth.js";
+import isAuth from "../middleware/auth.js";
 import { init as initSocket } from "../config/socket.js";
 
 const storage = multer.diskStorage({

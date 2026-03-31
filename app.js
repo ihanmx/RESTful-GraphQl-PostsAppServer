@@ -1,15 +1,14 @@
 import "dotenv/config";
 import express from "express";
-import feedRoutes from "./routes/feed.js";
-import authRoutes from "./routes/auth.js";
-import statusRoutes from "./routes/status.js";
+import auth from "./middleware/auth.js";
 import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url"; //to get __dirname in ES modules
 import { init as initSocket } from "./config/socket.js";
-import { graphqlHTTP } from "express-graphql";
+import { createHandler } from "graphql-http/lib/use/express";
+import { ruruHTML } from "ruru/server";
 import graphqlSchema from "./graphql/schema.js";
 import graphqlResolver from "./graphql/resolvers.js";
 const __filename = fileURLToPath(import.meta.url);
@@ -27,18 +26,39 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // app.use("/feed", feedRoutes);
 // app.use("/auth", authRoutes);
 // app.use("/status", statusRoutes);
+
+app.use(auth);
+
+app.use((req, res, next) => {
+  if (req.path === "/graphql" && req.method === "POST") {
+    console.log("GraphQL body:", JSON.stringify(req.body));
+  }
+  if (req.method === "OPTIONS") {
+    //handles option req from browser to avoid graphQl err and must be before graph middleware
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 //http://localhost:5000/graphql
+// GraphiQL UI
+app.get("/graphql", (req, res) => {
+  res.type("html");
+  res.end(ruruHTML({ endpoint: "/graphql" }));
+});
+
+// GraphQL endpoint
 app.use(
   "/graphql",
-  graphqlHTTP({
+  createHandler({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
-    graphiql: true, //special tool to test API
-    customFormatErrorFn(err) {
+    context: (req) => ({ req: req.raw }), //the way we use req in graphql-http
+    formatError(err) {
+      console.log("GraphQL Error:", err.message, err.originalError);
       if (!err.originalError) {
         return err;
       }
-
       const data = err.originalError.data;
       const message = err.originalError.message || "An error occurred";
       const code = err.originalError.code || 500;
