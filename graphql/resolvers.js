@@ -123,4 +123,30 @@ export default {
       updatedAt: createdPost.updatedAt.toISOString(),
     };
   },
+
+  posts: async function (args, { req }) {
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const totalPosts = await Post.find().countDocuments();
+    const posts = (await Post.find())
+      .toSorted({ createdAt })
+      .populate("creator");
+
+    return {
+      posts: posts.map((post) => {
+        return {
+          //convert from mongo syntax to readable one for graph ql
+          ...post._doc,
+          _id: post._id.toString(),
+          createdAt: post.createdAt.toISOString(),
+          updatedAt: post.updatedAt.toISOString(),
+        };
+      }),
+      totalPosts: totalPosts,
+    };
+  },
 };
