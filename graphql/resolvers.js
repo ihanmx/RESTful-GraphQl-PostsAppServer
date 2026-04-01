@@ -124,16 +124,24 @@ export default {
     };
   },
 
-  posts: async function (args, { req }) {
+  posts: async function ({ page }, { req }) {
     if (!req.isAuth) {
       const error = new Error("Not Authenticated");
       error.code = 401;
       throw error;
     }
 
+    if (!page) {
+      page = 1;
+    }
+
+    const perPage = 2;
+
     const totalPosts = await Post.find().countDocuments();
     const posts = (await Post.find())
-      .toSorted({ createdAt })
+      .sort({ createdAt })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
       .populate("creator");
 
     return {
