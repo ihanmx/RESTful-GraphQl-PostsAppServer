@@ -3,7 +3,7 @@
 Backend for a posts application. This repository contains two versions:
 
 - **`release/RESTful-APIs` branch** — REST API version
-- **`main branch or release/GraphQl` branch ** — GraphQL version
+- **`main branch or release/GraphQl` branch** — GraphQL version
 
 Both versions handle authentication, post CRUD, image uploads, and user status.
 
