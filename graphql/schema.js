@@ -56,6 +56,7 @@ const schema = buildSchema(`
     type RootQuery{
         login(email:String!,password:String!):AuthData!
         posts(page:Int!):PostsData!
+        post(id:ID!):Post!
 
     }
 
@@ -65,6 +66,7 @@ const schema = buildSchema(`
     type RootMutation {
         createUser(userInput:UserData):User!
         createPost(postInput:PostData):Post!
+        updatePost(id:ID!,postInput:PostData):Post!
     }
 
     schema {

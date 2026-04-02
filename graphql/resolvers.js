@@ -138,8 +138,8 @@ export default {
     const perPage = 2;
 
     const totalPosts = await Post.find().countDocuments();
-    const posts = (await Post.find())
-      .sort({ createdAt })
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate("creator");
@@ -155,6 +155,103 @@ export default {
         };
       }),
       totalPosts: totalPosts,
+    };
+  },
+
+  post: async function ({ id }, { req }) {
+    const errors = [];
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    if (!id) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    const post = await Post.findById(id).populate("creator");
+    if (!post) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    return {
+      ...post._doc,
+      _id: post._id.toString(),
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+    };
+  },
+
+  updatePost: async function ({ id, postInput }, { req }) {
+    const errors = [];
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    if (!id) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    if (!postInput) {
+      const error = new Error("Invalid input");
+      error.code = 422;
+      throw error;
+    }
+
+    if (
+      validator.isEmpty(postInput.title) ||
+      !validator.isLength(postInput.title, { min: 5 })
+    ) {
+      errors.push({ message: "title is invalid" });
+    }
+
+    if (
+      validator.isEmpty(postInput.content) ||
+      !validator.isLength(postInput.content, { min: 5 })
+    ) {
+      errors.push({ message: "content is invalid" });
+    }
+
+    if (errors.length > 0) {
+      const error = new Error("Invalid input");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
+    const updatedPost = await Post.findById(id).populate("creator");
+    if (!updatedPost) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+    if (updatedPost.creator._id.toString() !== req.userId) {
+      const error = new Error("Not Authorized");
+      error.code = 403;
+      throw error;
+    }
+
+    updatedPost.title = postInput.title;
+    updatedPost.content = postInput.content;
+    if (postInput.imageUrl !== "undefined") {
+      updatedPost.imageUrl = postInput.imageUrl;
+    }
+
+    const result = await updatedPost.save();
+    return {
+      ...result._doc,
+      _id: result._id.toString(),
+      createdAt: result.createdAt.toISOString(),
+      updatedAt: result.updatedAt.toISOString(),
     };
   },
 };
