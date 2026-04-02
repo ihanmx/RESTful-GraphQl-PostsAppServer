@@ -57,6 +57,7 @@ const schema = buildSchema(`
         login(email:String!,password:String!):AuthData!
         posts(page:Int!):PostsData!
         post(id:ID!):Post!
+        status:String!
 
     }
 
@@ -68,6 +69,7 @@ const schema = buildSchema(`
         createPost(postInput:PostData):Post!
         updatePost(id:ID!,postInput:PostData):Post!
         deletePost(id:ID!):Boolean!
+        updateStatus(status:String!):String!
     }
 
     schema {

@@ -4,6 +4,7 @@ import validator from "validator";
 import jwt from "jsonwebtoken";
 import Post from "../models/post.js";
 import { clearImage } from "../util/file.js";
+import { use } from "react";
 export default {
   createUser: async function ({ userInput }, req) {
     // const email=args.userInput.email
@@ -288,5 +289,40 @@ export default {
     await user.save();
 
     return true;
+  },
+
+  status: async function (_, { req }) {
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      const error = new Error("Not Authorized");
+      error.code = 403;
+      throw error;
+    }
+
+    return user.status;
+  },
+
+  updateStatus: async function ({ status }, { req }) {
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      const error = new Error("Not Authorized");
+      error.code = 403;
+      throw error;
+    }
+    user.status = status;
+    await user.save();
+    return user.status;
   },
 };
