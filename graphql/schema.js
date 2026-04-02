@@ -67,6 +67,7 @@ const schema = buildSchema(`
         createUser(userInput:UserData):User!
         createPost(postInput:PostData):Post!
         updatePost(id:ID!,postInput:PostData):Post!
+        deletePost(id:ID!):Boolean!
     }
 
     schema {

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import Post from "../models/post.js";
+import { clearImage } from "../util/file.js";
 export default {
   createUser: async function ({ userInput }, req) {
     // const email=args.userInput.email
@@ -253,5 +254,39 @@ export default {
       createdAt: result.createdAt.toISOString(),
       updatedAt: result.updatedAt.toISOString(),
     };
+  },
+
+  deletePost: async function ({ id }, { req }) {
+    if (!req.isAuth) {
+      const error = new Error("Not Authenticated");
+      error.code = 401;
+      throw error;
+    }
+
+    if (!id) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+
+    const post = await Post.findById(id);
+    if (!post) {
+      const error = new Error("Post not found");
+      error.code = 404;
+      throw error;
+    }
+    if (post.creator.toString() !== req.userId) {
+      const error = new Error("Not Authorized");
+      error.code = 403;
+      throw error;
+    }
+
+    clearImage(post.imageUrl);
+    await Post.findByIdAndDelete(id);
+    const user = await User.findById(req.userId);
+    user.posts.pull(id);
+    await user.save();
+
+    return true;
   },
 };
