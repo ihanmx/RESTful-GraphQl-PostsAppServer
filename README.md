@@ -240,3 +240,28 @@ Authorization: Bearer <token>
 ```
 
 The auth middleware verifies the token and attaches `req.userId` and `req.isAuth` for use in controllers/resolvers.
+
+
+## Testing (`release/RESTful-APIs` branch)
+
+Tests are written with **Mocha**, **Chai**, and **Sinon**.
+
+### Test stack
+
+- [Mocha](https://mochajs.org/) — test runner
+- [Chai](https://www.chaijs.com/) — assertions
+- [Sinon](https://sinonjs.org/) — stubs and mocks for isolating dependencies
+
+### Run tests
+
+```bash
+npm test
+```
+
+### Test files
+
+```
+server/test/
+├── auth-middleware.js    # Unit tests for JWT auth middleware
+├── auth-controller.js    # Unit + integration tests for auth & status controllers
+└── feed-controller.js    # Integration tests for post creation
